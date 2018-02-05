@@ -15,6 +15,8 @@ for fileid in movie_reviews.fileids('neg'):
     words = movie_reviews.words(fileid)
     neg_reviews.append((create_word_features(words), "negative"))
 
+print neg_reviews
+
 pos_reviews = []
 for fileid in movie_reviews.fileids('pos'):
     words = movie_reviews.words(fileid)

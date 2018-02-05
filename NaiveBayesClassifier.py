@@ -6,33 +6,41 @@ from nltk.corpus import twitter_samples
 import nltk
 import string
 import json
+import re
 nltk.download('twitter_samples')
 
 
 
 def create_word_features(words):
-
     useful_words = [word for word in words if word not in stopwords.words("english")] #elimina le parole "inutili" come preposizioni ecc
-    #useful_words.replace(":", "").replace(")", "").replace("(", "")   #elimina le emoticons
     my_dict = dict([(word, True) for word in useful_words])
     return my_dict
 
 neg_tweets = []
 strings_neg = twitter_samples.strings('negative_tweets.json')
 strings_neg = json.dumps(strings_neg)
-strings_neg = string.split(strings_neg)
+strings_neg = ''.join(item for item in strings_neg if not (item.startswith('"@') or item.startswith('@') or item.startswith('http'))) #rimuove tag e link
+strings_neg = strings_neg.replace(":", "").replace(")", "").replace("(", "")
+strings_neg = strings_neg.split()
 
 
-for word in strings_neg[:80]:
+
+
+for word in strings_neg[:10000]:
     neg_tweets.append((create_word_features(strings_neg), "negative"))
     print(neg_tweets)
+
 
 pos_tweets = []
 strings_pos = twitter_samples.strings('positive_tweets.json')
 strings_pos = json.dumps(strings_pos)
-strings_pos = string.split(strings_pos)
+strings_pos = ''.join(item for item in strings_pos if not (item.startswith('"@') or item.startswith('"@') or item.startswith('http'))) #rimuove tag e link
+strings_pos = strings_pos.replace(":", "").replace(")", "").replace("(", "")
+strings_pos = strings_pos.split()
 
-for word in strings_pos[:80]:
+
+
+for word in strings_pos[:10000]:
     pos_tweets.append((create_word_features(strings_pos), "positive"))
     print(pos_tweets)
 
@@ -40,8 +48,8 @@ for word in strings_pos[:80]:
 
 
 #implementiamo il training set e il test set in modo da avere rispettivamente 8000 e 2000 campioni
-train_set = neg_tweets[:60] + pos_tweets[:60]
-test_set =  neg_tweets[60:] + pos_tweets[60:]
+train_set = neg_tweets[:4000] + pos_tweets[:4000]
+test_set =  neg_tweets[4000:] + pos_tweets[4000:]
 classifier = NaiveBayesClassifier.train(train_set)
 
 accuracy = nltk.classify.util.accuracy(classifier, test_set)
@@ -58,11 +66,11 @@ words = create_word_features(words)
 result = classifier.classify(words)
 print result
 
+
+
+
 '''
-
-
-
-tweet_toy = 'The worst film I have ever seen. It was very horrible. It was an amazing night. The plot did not make sense and the shots were bad. I would not recommend this movie to anyone.'
+tweet_toy = 'The worst film I have ever seen. It was very horrible. The plot did not make sense and the shots were bad. I would not recommend this movie to anyone.'
 print(tweet_toy)
 
 
